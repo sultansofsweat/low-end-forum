@@ -477,7 +477,16 @@
 	
 	function display_topic_info($topic_id)
 	{
-		echo("<i>To be implemented</i>");
+		if(!empty($topic_id))
+		{
+			$topic_info=get_topic($topic_id);
+			display_last_post($topic_id);
+			echo("<br>IN: <a href=\"view_topic.php?topic_id=$topic_id\">" . $topic_info["Title"] . "</a> by " . display_username($topic_info["Creator"]));
+		}
+		else
+		{
+			echo("<i>There are no topics in this forum</i>");
+		}
 	}
 	
 	function display_statistics()
@@ -664,7 +673,7 @@
 		
 		$signature=process_bbcode($signature);
 		
-		echo($signature);
+		echo nl2br($signature);
 	}
 	
 	function process_bbcode($text)
