@@ -1,0 +1,14 @@
+body {
+      color:#00FF00;
+      background-color:#004000;
+    }
+    a  { color:#80FF00; }
+    a:visited { color:#80FF80; }
+    a:hover { color:#008000; }
+    a:active { color:#00AA00; }
+	
+	.event-day { background-color:#006600; }
+	table { border: 1px solid #00FF00; width:100%; }
+	tr { border: 1px solid #00FF00; }
+	th { border: 1px solid #00FF00; font-size:20pt; }
+	td { border: 1px solid #00FF00; vertical-align:top; }
