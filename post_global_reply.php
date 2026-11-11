@@ -99,38 +99,41 @@
 	{
 		$title=htmlspecialchars($_POST['title']);
 		$body=htmlspecialchars($_POST['body']);
-		$created_time=time();
-		
-		$parent_post=max($post_id,0);
-		$post=array("User"=>$_SESSION['user_id'],"Parent"=>$parent_post,"Title"=>$title,"Date"=>$created_time,"Text"=>$body,"Approved"=>1,"Deleted"=>0,"ReadBy"=>array($_SESSION['user_id']));
-		$topic_info["Posts"][]=$post;
-		
-		$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
-		
-		$query=$db->prepare("UPDATE globaltopics SET lastpost = ?,posts = ? WHERE id = ?");
-		$query->bindValue(1,$created_time,SQLITE3_INTEGER);
-		$query->bindValue(2,serialize($topic_info["Posts"]),SQLITE3_TEXT);
-		$query->bindValue(3,$topic_id,SQLITE3_INTEGER);
-		$result=$query->execute();
-		if($result !== false)
+		if($_POST['s'] != "Preview")
 		{
-			$good=true;
-		}
-		else
-		{
-			$good=false;
-		}
-		$query->close();
-		
-		$db->close();
-		
-		if($good === true)
-		{
-			die("<p><b>Reply creation <span style=\"color:#00FF00;\">SUCCESSFUL</span></b>. You can <a href=\"view_global_topic.php?topic_id=$topic_id\">go back to the topic</a>, or <a href=\"index.php\">go home</a>.</p>");
-		}
-		else
-		{
-			echo("<p><b>Reply creation <span style=\"color:#FF0000;\">FAILED</span></b>. There was an <b>internal error</b>. Please try again later.</p>");
+			$created_time=time();
+			
+			$parent_post=max($post_id,0);
+			$post=array("User"=>$_SESSION['user_id'],"Parent"=>$parent_post,"Title"=>$title,"Date"=>$created_time,"Text"=>$body,"Approved"=>1,"Deleted"=>0,"ReadBy"=>array($_SESSION['user_id']));
+			$topic_info["Posts"][]=$post;
+			
+			$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+			
+			$query=$db->prepare("UPDATE globaltopics SET lastpost = ?,posts = ? WHERE id = ?");
+			$query->bindValue(1,$created_time,SQLITE3_INTEGER);
+			$query->bindValue(2,serialize($topic_info["Posts"]),SQLITE3_TEXT);
+			$query->bindValue(3,$topic_id,SQLITE3_INTEGER);
+			$result=$query->execute();
+			if($result !== false)
+			{
+				$good=true;
+			}
+			else
+			{
+				$good=false;
+			}
+			$query->close();
+			
+			$db->close();
+			
+			if($good === true)
+			{
+				die("<p><b>Reply creation <span style=\"color:#00FF00;\">SUCCESSFUL</span></b>. You can <a href=\"view_global_topic.php?topic_id=$topic_id\">go back to the topic</a>, or <a href=\"index.php\">go home</a>.</p>");
+			}
+			else
+			{
+				echo("<p><b>Reply creation <span style=\"color:#FF0000;\">FAILED</span></b>. There was an <b>internal error</b>. Please try again later.</p>");
+			}
 		}
 	}
 ?>
@@ -149,15 +152,35 @@
 </table>
 <h2>Reply To Topic "<?php echo $topic_info["Title"]; ?>"</h2>
 <p>If you are replying to a specific post, the text from that post will be quoted. <b>Please remove everything except the text that you actually wish to quote</b>! This is a common courtesy, and consistently quoting entire posts, especially if they are large, may result in moderator action.</p>
+<?php
+	if(!empty($_POST['s']) && !empty($title) && !empty($body))
+	{
+		echo("<table>");
+		echo("<tr>");
+		echo("<th colspan=\"2\">POST PREVIEW</th>");
+		echo("</tr>");
+		echo("<tr>");
+		echo("<th style=\"text-align:right;\">Title</th>");
+		echo("<td>$title</td>");
+		echo("</tr>");
+		echo("<tr>");
+		echo("<th style=\"text-align:right;\">Content</th>");
+		echo("<td>" . nl2br(process_bbcode($body)) . "<hr>");
+		display_signature($_SESSION['user_id']);
+		echo("</td>");
+		echo("</tr>");
+		echo("</table>");
+		echo("<p></p>");
+	}
+?>
 <form method="post" action="post_global_reply.php">
-<input type="hidden" name="s" value="y">
 <input type="hidden" name="topic_id" value="<?php echo $topic_id; ?>">
 <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
 Post title: <input type="text" name="title" value="<?php echo $title; ?>" required="required" size="40"><br><br>
 Post body:<br>
 <textarea name="body" required="required" rows="20" cols="150"><?php echo $body; ?></textarea><br>
 Supported BBCodes: [b]###[/b],[i]###[/i],[u]###[/u],[url]###[/url] OR [url=###]optional text here[/url],[img]###[/img]<br><br>
-<input type="submit" value="Create post">
+<input type="submit" name="s" value="Create post">&nbsp;&nbsp;&nbsp;<input type="submit" name="s" value="Preview">
 </form>
 </body>
 </html>
