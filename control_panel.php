@@ -988,7 +988,7 @@
 			echo("</tr>");
 			echo("<tr>");
 			echo("<th style=\"text-align:right;\">Software Version Information</th>");
-			echo("<td>Low End Forum software version <b>1.0</b><br>Release date: NOT_SET<br>This software is copyright &copy; 2026 <a target=\"_blank\" href=\"https://github.com/sultansofsweat\">sultansofsweat</a>.</td>");
+			echo("<td>Low End Forum software version <b>1.1</b><br>Release date: November 11 2026<br>This software is copyright &copy; 2026 <a target=\"_blank\" href=\"https://github.com/sultansofsweat\">sultansofsweat</a>.</td>");
 			echo("</tr>");
 			break;
 			

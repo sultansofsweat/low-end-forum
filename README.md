@@ -29,3 +29,11 @@ How to install the Low End Forum software:
    2. "ln -s /var/www/lef-db/avatars &lt;your-lef-root&gt;/avatars"
 8. Move all the CSS themes into your created themes directory.
 9. Navigate to your web browser: "http://&lt;your-server&gt;/&lt;your-lef-root&gt;/init.php" and follow the script
+
+## Upgrading
+1. **TAKE A BACKUP!** The importance of backing up is often not clear until you *don't* and disaster strikes. So, just back up before doing anything.
+2. Download the LEF source code package for a given release, or the code package from the master branch. Download this somewhere *other* than the LEF root folder, e.g. your home folder.
+3. Unzip/untar the package, and go into the sub-directory it creates (something along the lines of "low-end-forum-<something>")
+4. Copy (or move) all of the PHP code files to the LEF root.
+5. **IF A DATABASE UPGRADE SCRIPT EXISTS:** navigate to your web browser: "http://&lt;your-server&gt;/&lt;your-lef-root&gt;/upgrade_database.php" and follow the script.
+6. Read the release notes and perform any special instructions if needed.
