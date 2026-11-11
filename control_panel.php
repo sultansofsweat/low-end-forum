@@ -250,11 +250,11 @@
 			$description=htmlspecialchars($_POST['description']);
 			$group_id=intval(preg_replace("/[^0-9]/","",$_POST['group']));
 			$viewlevel=intval(preg_replace("/[^0-9]/","",$_POST['viewlevel']));
-			$rawviewoverride=explode(",",intval(preg_replace("/[^0-9\,]/","",$_POST['viewoverride'])));
+			$rawviewoverride=explode(",",preg_replace("/[^0-9\,]/","",$_POST['viewoverride']));
 			$postlevel=intval(preg_replace("/[^0-9]/","",$_POST['postlevel']));
-			$rawpostoverride=explode(",",intval(preg_replace("/[^0-9\,]/","",$_POST['postoverride'])));
+			$rawpostoverride=explode(",",preg_replace("/[^0-9\,]/","",$_POST['postoverride']));
 			$modlevel=intval(preg_replace("/[^0-9]/","",$_POST['modlevel']));
-			$rawmodoverride=explode(",",intval(preg_replace("/[^0-9\,]/","",$_POST['modoverride'])));
+			$rawmodoverride=explode(",",preg_replace("/[^0-9\,]/","",$_POST['modoverride']));
 			$viewoverride=array();
 			$postoverride=array();
 			$modoverride=array();
@@ -988,7 +988,7 @@
 			echo("</tr>");
 			echo("<tr>");
 			echo("<th style=\"text-align:right;\">Software Version Information</th>");
-			echo("<td>Low End Forum software version <b>1.0</b><br>Release date: November 8 2026<br>This software is copyright &copy; 2026 <a target=\"_blank\" href=\"https://github.com/sultansofsweat\">sultansofsweat</a>.</td>");
+			echo("<td>Low End Forum software version <b>1.0</b><br>Release date: NOT_SET<br>This software is copyright &copy; 2026 <a target=\"_blank\" href=\"https://github.com/sultansofsweat\">sultansofsweat</a>.</td>");
 			echo("</tr>");
 			break;
 			
