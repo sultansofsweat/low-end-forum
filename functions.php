@@ -396,7 +396,7 @@
 				$db->close();
 				
 				$all_topics=get_all_topics();
-				$last_posted_time=0;
+				$last_posted_time=array();
 				foreach($all_topics as $topic_id=>$topic_info)
 				{
 					$forum=$topic_info["Forum"];
@@ -405,10 +405,10 @@
 					$forum_info[$forum]["TopicCount"]++;
 					$forum_info[$forum]["PostCount"]+=count($posts);
 					
-					if($topic_info["LastPost"] >= $last_posted_time)
+					if(empty($last_posted_time[$forum]) || $topic_info["LastPost"] >= $last_posted_time[$forum])
 					{
 						$forum_info[$forum]["LastTopic"]=$topic_id;
-						$last_posted_time=$topic_info["LastPost"];
+						$last_posted_time[$forum]=$topic_info["LastPost"];
 					}
 					
 					if($forum_info[$forum]["Unread"] === false)
@@ -439,10 +439,10 @@
 							echo("<img src=\"new.gif\" alt=\"New\" style=\"border:0px;\">");
 						}
 						echo("</td>");
-						echo("<td><a href=\"view_forum.php?forum_id=$forum_id\"><span style=\"font-size:20px;\"><b>" . $forum_info[$forum_id]["Name"] . "</b></span></a><br>" . $forum_info[$forum_id]["Description"] . "</td>");
-						echo("<td># topics:<br><b>" . $forum_info[$forum_id]["TopicCount"] . "</b></td>");
-						echo("<td># posts:<br><b>" . $forum_info[$forum_id]["PostCount"] . "</b></td>");
-						echo("<td>Most recent post:<br>");
+						echo("<td style=\"width:60%;\"><a href=\"view_forum.php?forum_id=$forum_id\"><span style=\"font-size:20px;\"><b>" . $forum_info[$forum_id]["Name"] . "</b></span></a><br>" . $forum_info[$forum_id]["Description"] . "</td>");
+						echo("<td style=\"width:5%; text-align:center;\"># topics:<br><b>" . $forum_info[$forum_id]["TopicCount"] . "</b></td>");
+						echo("<td style=\"width:5%; text-align:center;\"># posts:<br><b>" . $forum_info[$forum_id]["PostCount"] . "</b></td>");
+						echo("<td style=\"width:30%;\">Most recent post:<br>");
 						display_topic_info($forum_info[$forum_id]["LastTopic"]);
 						echo("</td>");
 						echo("</tr>");
@@ -480,6 +480,11 @@
 		if(!empty($topic_id))
 		{
 			$topic_info=get_topic($topic_id);
+			$topic_title=$topic_info["Title"];
+			if(strlen($topic_title) > 60)
+			{
+				$topic_title=substr($topic_title,0,60) . "...";
+			}
 			display_last_post($topic_id);
 			echo("<br>IN: <a href=\"view_topic.php?topic_id=$topic_id\">" . $topic_info["Title"] . "</a> by " . display_username($topic_info["Creator"]));
 		}
@@ -1031,7 +1036,14 @@
 		{
 			$timestamp=time();
 		}
-		return date("D, d F Y @ h:i A",adjust_timestamp($timestamp));
+		if($timestamp == 0)
+		{
+			return "<i>never</i>";
+		}
+		else
+		{
+			return date("D, d F Y @ h:i A",adjust_timestamp($timestamp));
+		}
 	}
 	
 	function print_tz_offset()
@@ -1210,7 +1222,12 @@
 		if($post_id > -1)
 		{
 			$post=$posts[$post_id];
-			echo("<b>" . $post["Title"] . "</b><br>Posted by " . display_username($post["User"]) . " on " . print_date($post["Date"]));
+			$title=$post["Title"];
+			if(strlen($title) > 100)
+			{
+				$title=substr($title,0,100) . "...";
+			}
+			echo("<b>" . $title . "</b><br>Posted by " . display_username($post["User"]) . " on " . print_date($post["Date"]));
 		}
 		else
 		{
@@ -1484,5 +1501,20 @@
 		$db->close();
 		
 		return($poll);
+	}
+	
+	function print_username($user_id)
+	{
+		$text=display_username($user_id);
+		
+		$user_details=get_user($user_id);
+		$tags=get_user_tags();
+		
+		if(in_array($user_details["Tag"],array_keys($tags)))
+		{
+			$text.="<br>" . $tags[$user_details["Tag"]];
+		}
+		
+		return $text;
 	}
 ?>

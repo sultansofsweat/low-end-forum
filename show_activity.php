@@ -5,13 +5,13 @@
 	
 	function sort_users($a,$b)
 	{
-		global $users;
+		global $activity;
 		
-		if($users[$a]["LastLogin"] > $users[$b]["LastLogin"])
+		if($activity[$a]["Time"] > $activity[$b]["Time"])
 		{
 			return -1;
 		}
-		elseif($users[$a]["LastLogin"] < $users[$b]["LastLogin"])
+		elseif($activity[$a]["Time"] < $activity[$b]["Time"])
 		{
 			return 1;
 		}
@@ -84,6 +84,8 @@
 			$activity[]=$a;
 		}
 	}
+	
+	uksort($activity,"sort_users");
 ?>
 <html>
 <head>
