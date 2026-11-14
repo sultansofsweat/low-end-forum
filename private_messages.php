@@ -22,7 +22,7 @@
 ?>
 <html>
 <head>
-<title><?php echo $forum_name; ?> - View Forum: <?php echo $forum_info["Name"]; ?></title>
+<title><?php echo $forum_name; ?> - View Private Messages</title>
 <link rel="stylesheet" href="<?php echo $stylesheet; ?>">
 </head>
 <body>

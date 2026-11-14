@@ -146,7 +146,7 @@ Last message sent on: <?php echo print_date($thread_info["LastPost"]); ?>
 		echo("<tr>");
 		echo("<td style=\"background-color:$bgcolour\" rowspan=\"5\" style=\"text-align:center;\"><a name=\"$id\"></a>");
 		display_avatar($post["User"]);
-		echo("<br>" . display_username($post["User"]) . "</td>");
+		echo("<br>" . print_username($post["User"]) . "</td>");
 		echo("<th style=\"background-color:$bgcolour\">");
 		if($post["ReadBy"] === false)
 		{

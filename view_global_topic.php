@@ -219,7 +219,7 @@ Last post made on: <?php echo print_date($topic_info["LastPost"]); ?>
 				echo("<tr>");
 				echo("<td style=\"background-color:$bgcolour\" rowspan=\"$rows\" style=\"text-align:center;\"><a name=\"$id\"></a>");
 				display_avatar($post["User"]);
-				echo("<br>" . display_username($post["User"]) . "</td>");
+				echo("<br>" . print_username($post["User"]) . "</td>");
 				echo("<th style=\"background-color:$bgcolour\">");
 				if(!in_array($_SESSION['user_id'],$post["ReadBy"]))
 				{
