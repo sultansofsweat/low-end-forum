@@ -693,6 +693,8 @@
 		$text=preg_replace("/\[url\](.*?)\[\/url\]/","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
 		$text=preg_replace("/\[url\=(.*?)\](.*?)\[\/url\]/","<a href=\"\\1\" target=\"_blank\">\\2</a>",$text);
 		$text=preg_replace("/\[img\](.*?)\[\/img\]/","<a href=\"\\1\" target=\"_blank\"><img src=\"\\1\" alt=\"image\" style=\"width:150px; border:0px;\"></a>",$text);
+		//$text=preg_replace("/\[quote\=(.*?)\](.*?)\[\/quote\]/","<div class=\"quote-box\">Written by <b>\\1</b>:<hr>\\2</div>",$text);
+		$text=preg_replace("/\[emote\](.*?)\[\/emote\]/","<img src=\"emoticons/\\1.gif\" alt=\"emoticon\" style=\"border:0px;\">",$text);
 		
 		return $text;
 	}
@@ -1516,5 +1518,66 @@
 		}
 		
 		return $text;
+	}
+	
+	function get_emoticon_list()
+	{
+		return unserialize(get_setting("emoticons"));
+	}
+	
+	function get_selections_for_topic($topic_id)
+	{
+		$selections=array();
+		
+		$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
+		
+		$query=$db->prepare("SELECT id,createdby,opened,closed,options,deleted FROM selections WHERE topic = ?");
+		$query->bindValue(1,$topic_id,SQLITE3_INTEGER);
+		$results=$query->execute();
+		while($result=$results->fetchArray(SQLITE3_ASSOC))
+		{
+			if(get_user_level($_SESSION['user_id']) < 8 && $result["Deleted"] == 1)
+			{
+				continue;
+			}
+			$selection=array();
+			foreach($result as $key=>$value)
+			{
+				$selection[$key]=$value;
+			}
+			$selection["Options"]=unserialize($result["Options"]);
+			$selections[$result["ID"]]=$selection;
+		}
+		$results->finalize();
+		$query->close();
+		
+		$db->close();
+		
+		return($selections);
+	}
+	
+	function get_selection($sel_id)
+	{
+		$details=array();
+		
+		$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
+		
+		$query=$db->prepare("SELECT topic,createdby,opened,closed,multiselect,options,deleted FROM selections WHERE id = ?");
+		$query->bindValue(1,$sel_id,SQLITE3_INTEGER);
+		$results=$query->execute();
+		while($result=$results->fetchArray(SQLITE3_ASSOC))
+		{
+			foreach($result as $key=>$value)
+			{
+				$details[$key]=$value;
+			}
+			$details["Options"]=unserialize($result["Options"]);
+		}
+		$results->finalize();
+		$query->close();
+		
+		$db->close();
+		
+		return($details);
 	}
 ?>
