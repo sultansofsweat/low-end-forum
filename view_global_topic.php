@@ -37,22 +37,6 @@
 	
 	$topic_info=get_topic($topic_id,true);
 	
-	/*$forum_info=array();
-	
-	$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
-			
-	$query=$db->prepare("SELECT viewlevel,viewoverride,postlevel,postoverride,modlevel,modoverride,showtoall FROM forums WHERE id = ?");
-	$query->bindValue(1,$topic_info["Forum"],SQLITE3_INTEGER);
-	$results=$query->execute();
-	while($result=$results->fetchArray(SQLITE3_ASSOC))
-	{
-		$forum_info=array("ShowToAll"=>$result["ShowToAll"],"ViewLevel"=>$result["ViewLevel"],"ViewOverride"=>unserialize($result["ViewOverride"]),"PostLevel"=>$result["PostLevel"],"PostOverride"=>unserialize($result["PostOverride"]),"ModLevel"=>$result["ModLevel"],"ModOverride"=>unserialize($result["ModOverride"]));
-	}
-	$results->finalize();
-	$query->close();
-	
-	$db->close();*/
-	
 	if($user_level >= 8)
 	{
 		$is_moderator=true;
