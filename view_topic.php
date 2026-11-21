@@ -389,9 +389,9 @@ Last post made on: <?php echo print_date($topic_info["LastPost"]); ?>
 				{
 					echo("<span style=\"text-decoration:line-through;\">Make a selection</span>");
 				}
-				if($_SESSION['user_id'] == $post["User"] || $is_moderator === true)
+				if($_SESSION['user_id'] == $selection["CreatedBy"] || $is_moderator === true)
 				{
-					if($post["Closed"] == 0)
+					if($selection["Closed"] == 0)
 					{
 						echo(" | <a href=\"close_selection.php?sel_id=$id\">Close this selection</a>");
 					}
@@ -399,13 +399,13 @@ Last post made on: <?php echo print_date($topic_info["LastPost"]); ?>
 					{
 						echo(" | <a href=\"open_selection.php?sel_id=$id\">Reopen this selection</a>");
 					}
-					if($post["Deleted"] == 0)
+					if($selection["Deleted"] == 0)
 					{
-						echo(" | <a href=\"delete_selection.php?sel_id=$id\">Delete this post</a>");
+						echo(" | <a href=\"delete_selection.php?sel_id=$id\">Delete this selection</a>");
 					}
 					else
 					{
-						echo(" | <a href=\"undelete_selection.php?sel_id=$id\">Undelete this post</a>");
+						echo(" | <a href=\"undelete_selection.php?sel_id=$id\">Undelete this selection</a>");
 					}
 				}
 				echo("</td>");
