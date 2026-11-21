@@ -75,6 +75,7 @@
 	
 	$informal_polls=get_polls($topic_id,false);
 	$formal_polls=get_polls($topic_id,true);
+	$selections=get_selections_for_topic($topic_id);
 	
 	$posts=array();
 	foreach($topic_info["Posts"] as $id=>$post)
@@ -194,6 +195,14 @@ Last post made on: <?php echo print_date($topic_info["LastPost"]); ?>
 	else
 	{
 		echo(" | <span style=\"text-decoration:line-through;\">Create a poll on this topic</span>");
+	}
+	if($user_level >= 6 && $is_postable === true)
+	{
+		echo(" | <a href=\"create_selection.php?topic_id=$topic_id\">Create an option selector on this topic</a>");
+	}
+	else
+	{
+		echo(" | <span style=\"text-decoration:line-through;\">Create an option selector on this topic</span>");
 	}
 	if($is_moderator === true)
 	{
@@ -326,6 +335,80 @@ Last post made on: <?php echo print_date($topic_info["LastPost"]); ?>
 				{
 					echo("<td><b><span style=\"color:$bgcolour;\">" . print_date($poll["Closed"]) . "</b></span></td>");
 				}
+				echo("</tr>");
+			}
+			echo("</table>");
+			echo("<p></p>");
+		}
+		if(count($selections) > 0)
+		{
+			echo("<table>");
+			foreach($selections as $id=>$selection)
+			{
+				$bgcolour="rgba(255,255,255,0);";
+				if(!empty($selection["Closed"]))
+				{
+					$bgcolour="rgba(255,255,0,0.2);";
+				}
+				if(!empty($selection["Deleted"]))
+				{
+					$bgcolour="rgba(255,0,0,0.2);";
+				}
+				echo("<tr>");
+				echo("<td style=\"background-color:$bgcolour\" rowspan=\"3\" style=\"text-align:center;\">");
+				display_avatar($selection["CreatedBy"]);
+				echo("<br>" . print_username($selection["CreatedBy"]) . "</td>");
+				echo("<th style=\"background-color:$bgcolour\">" . $selection["Name"] . "</th>");
+				echo("</tr>");
+				echo("<tr>");
+				echo("<td style=\"background-color:$bgcolour\">");
+				$output=array();
+				foreach($selection["Options"] as $option)
+				{
+					$text="<b>" . $option["Name"] . "</b>: ";
+					if(!empty($option["User"]))
+					{
+						$text.=get_username($option["User"]);
+					}
+					else
+					{
+						$text.="<i>vacant</i>";
+					}
+					$output[]=$text;
+				}
+				echo implode("<br>",$output);
+				echo("</td>");
+				echo("</tr>");
+				echo("<tr>");
+				echo("<td style=\"background-color:$bgcolour\">");
+				if(empty($selection["Closed"]))
+				{
+					echo("<a href=\"add_selection.php?sel_id=$id\">Make a selection</a>");
+				}
+				else
+				{
+					echo("<span style=\"text-decoration:line-through;\">Make a selection</span>");
+				}
+				if($_SESSION['user_id'] == $post["User"] || $is_moderator === true)
+				{
+					if($post["Closed"] == 0)
+					{
+						echo(" | <a href=\"close_selection.php?sel_id=$id\">Close this selection</a>");
+					}
+					else
+					{
+						echo(" | <a href=\"open_selection.php?sel_id=$id\">Reopen this selection</a>");
+					}
+					if($post["Deleted"] == 0)
+					{
+						echo(" | <a href=\"delete_selection.php?sel_id=$id\">Delete this post</a>");
+					}
+					else
+					{
+						echo(" | <a href=\"undelete_selection.php?sel_id=$id\">Undelete this post</a>");
+					}
+				}
+				echo("</td>");
 				echo("</tr>");
 			}
 			echo("</table>");

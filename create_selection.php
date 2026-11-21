@@ -7,6 +7,7 @@
 	
 	$topic_id=0;
 	
+	$title="";
 	$options=array();
 	$multi_select=0;
 	
@@ -62,6 +63,7 @@
 	
 	if(!empty($_POST['s']))
 	{
+		$title=htmlspecialchars($_POST['title']);
 		$options=explode("\n",htmlspecialchars($_POST['options']));
 		foreach(array_keys($options) as $key)
 		{
@@ -84,12 +86,13 @@
 			
 			$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
 			
-			$query=$db->prepare("INSERT INTO selection(topic,createdby,opened,multiselect,options) VALUES (?,?,?,?,?)");
-			$query->bindValue(1,$topic_id,SQLITE3_INTEGER);
-			$query->bindValue(2,$_SESSION['user_id'],SQLITE3_INTEGER);
-			$query->bindValue(3,$open_time,SQLITE3_INTEGER);
-			$query->bindValue(4,$multi_select,SQLITE3_INTEGER);
-			$query->bindValue(5,serialize($option_array),SQLITE3_TEXT);
+			$query=$db->prepare("INSERT INTO selection(name,topic,createdby,opened,multiselect,options) VALUES (?,?,?,?,?,?)");
+			$query->bindValue(1,$title,SQLITE3_TEXT);
+			$query->bindValue(2,$topic_id,SQLITE3_INTEGER);
+			$query->bindValue(3,$_SESSION['user_id'],SQLITE3_INTEGER);
+			$query->bindValue(4,$open_time,SQLITE3_INTEGER);
+			$query->bindValue(5,$multi_select,SQLITE3_INTEGER);
+			$query->bindValue(6,serialize($option_array),SQLITE3_TEXT);
 			$query->execute();
 			$query->close();
 			
@@ -140,6 +143,7 @@
 <form method="post" action="create_selection.php">
 <input type="hidden" name="s" value="y">
 <input type="hidden" name="topic_id" value="<?php echo $topic_id; ?>">
+Selector title: <input type="text" name="title" value="<?php echo $title; ?>" required="required" size="40"><br><br>
 Enter your selection options, one per line, below:<br>
 <textarea name="options" required="required" rows="10" cols="50"><?php echo implode("\n",$options); ?></textarea><br><br>
 <input type="checkbox" name="multiselect" value="y" <?php if($multi_select == 1) { echo "checked=\"checked\""; } ?>> Allow multiple selections for users<br><br>
