@@ -161,7 +161,7 @@
 	
 	function get_initialization_status()
 	{
-		if(get_setting("initialized") == "NO")
+		if(get_setting("initialized") == "NO" || file_exists("update_software.php"))
 		{
 			return false;
 		}

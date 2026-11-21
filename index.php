@@ -39,7 +39,7 @@
 		echo("<th style=\"color:#FF0000;\">THIS FORUM IS NOT SET UP YET!</th>");
 		echo("</tr>");
 		echo("<tr>");
-		echo("<td>If you are the forum administrator, please run the initial setup script!<br>If you are not the forum administrator, please wait patiently as something good is coming!</td>");
+		echo("<td>If you are the forum administrator, please run either the initial setup script for a brand new forum, or the software update script if you installed an update!<br>If you are not the forum administrator, please wait patiently as something good is coming!</td>");
 		echo("</tr>");
 		echo("</table>");
 	}
