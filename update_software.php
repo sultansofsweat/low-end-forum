@@ -38,7 +38,7 @@
 Please make sure to read the release notes on Github for further actions required!</p>
 <hr>
 <?php
-	echo("<pre>LOW END FORUM SOFTWARE UPGRADE - VERSION 1.2\n\n");
+	echo("<pre>LOW END FORUM SOFTWARE UPGRADE - VERSION 1.3\n\n");
 	echo("Checking for presence of emoticon directory...");
 	$emoticon_dir_exists=false;
 	if(file_exists("/var/www/lef-db/emoticons") && is_dir("/var/www/lef-db/emoticons"))
@@ -130,6 +130,31 @@ Please make sure to read the release notes on Github for further actions require
 	{
 		echo("Checking for presence of \"emoticons\" setting in database...SKIPPED\n");
 		echo("Adding \"emoticons\" setting to database...SKIPPED\n");
+	}
+	echo("Adding database table \"Selection\" (if it doesn't exist)...");
+	$create_statement="CREATE TABLE IF NOT EXISTS \"Selection\" (
+	\"ID\"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	\"Topic\"	INTEGER NOT NULL,
+	\"Name\"	TEXT NOT NULL,
+	\"CreatedBy\"	INTEGER NOT NULL,
+	\"Opened\"	INTEGER NOT NULL,
+	\"Closed\"	INTEGER NOT NULL DEFAULT 0,
+	\"MultiSelect\"	INTEGER NOT NULL,
+	\"Options\"	TEXT NOT NULL,
+	\"Deleted\"	INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY(\"CreatedBy\") REFERENCES \"Users\"(\"ID\") ON DELETE RESTRICT ON UPDATE CASCADE,
+	FOREIGN KEY(\"Topic\") REFERENCES \"Topics\"(\"ID\") ON DELETE CASCADE ON UPDATE CASCADE
+)";
+	$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+	$debug=$db->exec($create_statement);
+	$db->close();
+	if($debug !== false)
+	{
+		echo("done.\n");
+	}
+	else
+	{
+		echo("FAILED! Internal error. Try again later.\n");
 	}
 	echo("\nDONE ALL STEPS. Please check above for further actions needed, and manually delete this \"upgrade_software.php\" file!");
 	echo("</pre>");
