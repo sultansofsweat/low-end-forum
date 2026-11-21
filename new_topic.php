@@ -152,6 +152,21 @@
 <head>
 <title><?php echo $forum_name; ?> - Post New Topic</title>
 <link rel="stylesheet" href="<?php echo $stylesheet; ?>">
+<script type="text/javascript">
+function toggleEmoteBox() {
+	if(document.getElementById('emoteBox').style.display == 'none') {
+		document.getElementById('emoteBox').style.display = 'block';
+		document.getElementById('boxToggle').value = 'Hide emoticon list';
+	} else {
+		document.getElementById('emoteBox').style.display = 'none';
+		document.getElementById('boxToggle').value = 'Show emoticon list';
+	}
+}
+
+function insertEmoticon(filename) {
+	document.getElementById('body').value+=" [emote]" + filename + "[/emote]";
+}
+</script>
 </head>
 <body>
 <?php if(!empty($forum_logo)) { echo("<p><img src=\"avatars/$forum_logo\" alt=\"Low End Forum Logo\" style=\"border:0px;\"></p>"); } ?>
@@ -209,8 +224,24 @@ Post in forum: <select name="forum" required="required">
 </select><br><br>
 Topic title: <input type="text" name="title" value="<?php echo $title; ?>" required="required" size="40"> (this is also your post title)<br><br>
 Post body:<br>
-<textarea name="body" required="required" rows="20" cols="150"><?php echo $body; ?></textarea><br>
-Supported BBCodes: [b]###[/b],[i]###[/i],[u]###[/u],[url]###[/url] OR [url=###]optional text here[/url],[img]###[/img]<br><br>
+<textarea id="body" name="body" required="required" rows="20" cols="150"><?php echo $body; ?></textarea><br>
+Supported BBCodes: [b]###[/b],[i]###[/i],[u]###[/u],[url]###[/url] OR [url=###]optional text here[/url],[img]###[/img], [emote]###[/emote]<br><br>
+<input type="button" id="boxToggle" value="Show emoticon list" onclick="toggleEmoteBox()"><br>
+<div id="emoteBox" style="display:none;">
+<?php
+	$i=0;
+	foreach(get_emoticon_list() as $filename)
+	{
+		$i++;
+		echo("<img src=\"emoticons/$filename.gif\" alt=\"emoticon\" style=\"border:0px;\" onclick=\"insertEmoticon('$filename')\">&nbsp;");
+		if($i >= 20)
+		{
+			echo("<br>");
+			$i=0;
+		}
+	}
+?>
+</div><br><br>
 <input type="submit" name="s" value="Create topic">&nbsp;&nbsp;&nbsp;<input type="submit" name="s" value="Preview">
 </form>
 </body>

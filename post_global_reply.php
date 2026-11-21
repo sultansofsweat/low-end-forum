@@ -54,22 +54,6 @@
 	
 	$topic_info=get_topic($topic_id,true);
 	
-	/*$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
-			
-	$query=$db->prepare("SELECT id,postlevel,postoverride FROM forums");
-	$results=$query->execute();
-	while($result=$results->fetchArray(SQLITE3_ASSOC))
-	{
-		if($user_level >= $result["PostLevel"] || in_array($_SESSION['user_id'],unserialize($result["PostOverride"])))
-		{
-			$postable_forums[$result["ID"]]=$all_forums[$result["ID"]];
-		}
-	}
-	$results->finalize();
-	$query->close();
-	
-	$db->close();*/
-	
 	if($user_level < 6)
 	{
 		die("<script type=\"text/javascript\">window.location = 'view_global_topic.php?topic_id=$topic_id'</script>");
@@ -141,6 +125,21 @@
 <head>
 <title><?php echo $forum_name; ?> - Post Reply</title>
 <link rel="stylesheet" href="<?php echo $stylesheet; ?>">
+<script type="text/javascript">
+function toggleEmoteBox() {
+	if(document.getElementById('emoteBox').style.display == 'none') {
+		document.getElementById('emoteBox').style.display = 'block';
+		document.getElementById('boxToggle').value = 'Hide emoticon list';
+	} else {
+		document.getElementById('emoteBox').style.display = 'none';
+		document.getElementById('boxToggle').value = 'Show emoticon list';
+	}
+}
+
+function insertEmoticon(filename) {
+	document.getElementById('body').value+=" [emote]" + filename + "[/emote]";
+}
+</script>
 </head>
 <body>
 <?php if(!empty($forum_logo)) { echo("<p><img src=\"avatars/$forum_logo\" alt=\"Low End Forum Logo\" style=\"border:0px;\"></p>"); } ?>
@@ -178,8 +177,24 @@
 <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
 Post title: <input type="text" name="title" value="<?php echo $title; ?>" required="required" size="40"><br><br>
 Post body:<br>
-<textarea name="body" required="required" rows="20" cols="150"><?php echo $body; ?></textarea><br>
-Supported BBCodes: [b]###[/b],[i]###[/i],[u]###[/u],[url]###[/url] OR [url=###]optional text here[/url],[img]###[/img]<br><br>
+<textarea id="body" name="body" required="required" rows="20" cols="150"><?php echo $body; ?></textarea><br>
+Supported BBCodes: [b]###[/b],[i]###[/i],[u]###[/u],[url]###[/url] OR [url=###]optional text here[/url],[img]###[/img], [emote]###[/emote]<br><br>
+<input type="button" id="boxToggle" value="Show emoticon list" onclick="toggleEmoteBox()"><br>
+<div id="emoteBox" style="display:none;">
+<?php
+	$i=0;
+	foreach(get_emoticon_list() as $filename)
+	{
+		$i++;
+		echo("<img src=\"emoticons/$filename.gif\" alt=\"emoticon\" style=\"border:0px;\" onclick=\"insertEmoticon('$filename')\">&nbsp;");
+		if($i >= 20)
+		{
+			echo("<br>");
+			$i=0;
+		}
+	}
+?>
+</div><br><br>
 <input type="submit" name="s" value="Create post">&nbsp;&nbsp;&nbsp;<input type="submit" name="s" value="Preview">
 </form>
 </body>
