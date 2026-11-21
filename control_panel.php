@@ -537,6 +537,80 @@
 			$query->close();
 			$db->close();
 			break;
+			
+			case "admin-addemoticon":
+			$emoticon_list=get_emoticon_list();
+			$filename=strtolower(preg_replace("/[^A-Za-z0-9]/","",$_POST['filename']));
+			if(!empty($_FILES['file']) && file_exists($_FILES['file']['tmp_name']))
+			{
+				rename($_FILES['file']['tmp_name'],"emoticons/$filename.gif");
+				
+				$emoticon_list[]=$filename;
+				
+				$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+				$query=$db->prepare("UPDATE settings SET value = ? WHERE name = ?");
+				$query->bindValue(1,serialize($emoticon_list),SQLITE3_TEXT);
+				$query->bindValue(2,"emoticons",SQLITE3_TEXT);
+				$query->execute();
+				$query->close();
+				$db->close();
+			}
+			break;
+			
+			case "admin-changeemoticon":
+			$filename=strtolower(preg_replace("/[^A-Za-z0-9]/","",$_POST['emote']));
+			if(!empty($_FILES['file']) && file_exists($_FILES['file']['tmp_name']))
+			{
+				rename($_FILES['file']['tmp_name'],"emoticons/$filename.gif");
+			}
+			break;
+			
+			case "admin-moveemoticon":
+			$emoticon_list=get_emoticon_list();
+			$to_rename=intval(preg_replace("/[^0-9]/","",$_POST['emote']));
+			$new_name=strtolower(preg_replace("/[^A-Za-z0-9]/","",$_POST['filename']));
+			
+			$existing_file=$emoticon_list[$to_rename];
+			rename("emoticons/$existing_file.gif","emoticons/$new_name.gif");
+			$emoticon_list[$to_rename]=$new_name;
+			
+			$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+			$query=$db->prepare("UPDATE settings SET value = ? WHERE name = ?");
+			$query->bindValue(1,serialize($emoticon_list),SQLITE3_TEXT);
+			$query->bindValue(2,"emoticons",SQLITE3_TEXT);
+			$query->execute();
+			$query->close();
+			$db->close();
+			break;
+			
+			case "admin-emoteorder":
+			$emoticon_list=explode("\n",preg_replace("/[^a-z0-9\n]/","",$_POST['order']));
+			
+			$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+			$query=$db->prepare("UPDATE settings SET value = ? WHERE name = ?");
+			$query->bindValue(1,serialize($emoticon_list),SQLITE3_TEXT);
+			$query->bindValue(2,"emoticons",SQLITE3_TEXT);
+			$query->execute();
+			$query->close();
+			$db->close();
+			break;
+			
+			case "admin-rememote":
+			$emoticon_list=get_emoticon_list();
+			$to_remove=intval(preg_replace("/[^0-9]/","",$_POST['emote']));
+			
+			$filename=$emoticon_list[$to_remove];
+			unlink("emoticons/$filename.gif");
+			unset($emoticon_list[$to_remove]);
+			
+			$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READWRITE);
+			$query=$db->prepare("UPDATE settings SET value = ? WHERE name = ?");
+			$query->bindValue(1,serialize($emoticon_list),SQLITE3_TEXT);
+			$query->bindValue(2,"emoticons",SQLITE3_TEXT);
+			$query->execute();
+			$query->close();
+			$db->close();
+			break;
 		}
 		die("<p>Settings have been updated. <a href=\"control_panel.php\">Click here</a> to proceed.</p>");
 	}
@@ -642,7 +716,7 @@
 			break;
 			
 			case "admin":
-			$options=array("forumgroups"=>"Edit Forum Groups","forums"=>"Edit Forums","users"=>"User manager","globalsettings"=>"Forum settings","defaultavatar"=>"Default avatar","logo"=>"Forum logo","themes"=>"Themes");
+			$options=array("forumgroups"=>"Edit Forum Groups","forums"=>"Edit Forums","users"=>"User manager","globalsettings"=>"Forum settings","defaultavatar"=>"Default avatar","logo"=>"Forum logo","themes"=>"Themes","emotes"=>"Emoticons");
 			break;
 			
 			default:
@@ -1032,7 +1106,66 @@
 			echo("</tr>");
 			break;
 			
+			case "emotes":
+			$emoticon_list=get_emoticon_list();
+			echo("<th style=\"text-align:right;\">Current emoticons</th>");
+			echo("<td>Use this as a reference to see the current list, and order, of the emoticons available to users!<br><br>");
+			$i=0;
+			foreach($emoticon_list as $filename)
+			{
+				$i++;
+				echo("<img src=\"emoticons/$filename.gif\" alt=\"emoticon\" style=\"border:0px;\">&nbsp;");
+				if($i >= 10)
+				{
+					echo("<br>");
+					$i=0;
+				}
+			}
+			echo("</td>");
+			echo("</tr>");
+			echo("<tr>");
+			echo("<th style=\"text-align:right;\">Add New Emoticon</th>");
+			echo("<td>Emoticons MUST be in .GIF format. No other restrictions, but please bear in mind the size of the image.<br><br><form method=\"post\" action=\"control_panel.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"s\" value=\"admin-addemoticon\">File: <input type=\"file\" name=\"file\" accept=\"image/gif\"><br><br>Emoticon name: <input type=\"text\" name=\"filename\" required=\"required\"> (lowercase letters and numbers ONLY!)<br><br><input type=\"submit\" value=\"Upload\"></form></td>");
+			echo("</tr>");
+			echo("<tr>");
+			echo("<th style=\"text-align:right;\">Replace Emoticon</th>");
+			echo("<td>Emoticons MUST be in .GIF format. No other restrictions, but please bear in mind the size of the image.<br><br><form method=\"post\" action=\"control_panel.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"s\" value=\"admin-changeemoticon\">Select emoticon: <select name=\"emote\" required=\"required\">");
+			echo("<option value=\"\"></option>");
+			foreach($emoticon_list as $filename)
+			{
+				echo("<option value=\"$filename\">$filename</option>");
+			}
+			echo("</select><br><br>New File: <input type=\"file\" name=\"file\" accept=\"image/gif\"><br><br><input type=\"submit\" value=\"Upload\"></form></td>");
+			echo("</tr>");
+			echo("<tr>");
+			echo("<th style=\"text-align:right;\">Rename Emoticon</th>");
+			echo("<td><form method=\"post\" action=\"control_panel.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"s\" value=\"admin-moveemoticon\">Select emoticon: <select name=\"emote\" required=\"required\">");
+			echo("<option value=\"\"></option>");
+			foreach($emoticon_list as $id=>$filename)
+			{
+				echo("<option value=\"$id\">$filename</option>");
+			}
+			echo("</select><br><br>Change name to: <input type=\"text\" name=\"filename\" required=\"required\"> (lowercase letters and numbers ONLY!)<br><br><input type=\"submit\" value=\"Rename\"></form></td>");
+			echo("</tr>");
+			echo("<tr>");
+			echo("<th style=\"text-align:right;\">Change Emoticon Order</th>");
+			echo("<td><form method=\"post\" action=\"control_panel.php\"><input type=\"hidden\" name=\"s\" value=\"admin-emoteorder\"><textarea name=\"order\" required=\"required\" rows=\"10\" cols=\"50\">");
+			echo implode("\n",$emoticon_list);
+			echo("</textarea><br><br><input type=\"submit\" value=\"Update order\"></form></td>");
+			echo("</tr>");
+			echo("<tr>");
+			echo("<th style=\"text-align:right;\">Delete Emoticon</th>");
+			echo("<td><form method=\"post\" action=\"control_panel.php\"><input type=\"hidden\" name=\"s\" value=\"admin-rememote\">Select emote to delete: <select name=\"emote\" required=\"required\">");
+			echo("<option value=\"\"></option>");
+			foreach($emoticon_list as $id=>$filename)
+			{
+				echo("<option value=\"$id\">$filename</option>");
+			}
+			echo("</select><br><br><input type=\"submit\" value=\"Delete\"></form></td>");
+			break;
+			
 			case "themes":
+			default:
 			echo("<td colspan=\"2\" style=\"text-align:center;\"><i>This feature is not yet implemented.</i></td>");
 			break;
 		}
