@@ -1531,7 +1531,7 @@
 		
 		$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
 		
-		$query=$db->prepare("SELECT id,createdby,opened,closed,options,deleted FROM selections WHERE topic = ?");
+		$query=$db->prepare("SELECT id,createdby,opened,closed,options,deleted FROM selection WHERE topic = ?");
 		$query->bindValue(1,$topic_id,SQLITE3_INTEGER);
 		$results=$query->execute();
 		while($result=$results->fetchArray(SQLITE3_ASSOC))
@@ -1562,7 +1562,7 @@
 		
 		$db=new SQLite3("/var/www/lef-db/database.sqlite",SQLITE3_OPEN_READONLY);
 		
-		$query=$db->prepare("SELECT topic,createdby,opened,closed,multiselect,options,deleted FROM selections WHERE id = ?");
+		$query=$db->prepare("SELECT topic,createdby,opened,closed,multiselect,options,deleted FROM selection WHERE id = ?");
 		$query->bindValue(1,$sel_id,SQLITE3_INTEGER);
 		$results=$query->execute();
 		while($result=$results->fetchArray(SQLITE3_ASSOC))
